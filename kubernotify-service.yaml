@@ -6,16 +6,16 @@ metadata:
     kompose.version: 1.30.0 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: whale-deliver
-  name: whale-deliver
+    io.kompose.service: kubernotify
+  name: kubernotify
   namespace: default
 spec:
-  type: NodePort
   ports:
-    - name: "5001"
-      port: 5001
-      targetPort: 8080
+    - name: "4001"
+      port: 6000
+      targetPort: 6000
   selector:
-    io.kompose.service: whale-deliver
+    io.kompose.service: kubernotify
 status:
   loadBalancer: {}
+`
