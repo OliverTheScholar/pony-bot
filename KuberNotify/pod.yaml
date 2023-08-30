@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubernotify
+  namespace: kubernotify
+spec:
+  serviceAccountName: kubenotify-service-account
+  containers:
+  - name: kubernotify-container
+    image: kubernotify:latest
