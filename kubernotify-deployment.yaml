@@ -26,9 +26,11 @@ spec:
         io.kompose.service: kubernotify
     spec:
       containers:
-        - image: kubernotify
+        - image: kubernotify:latest
           name: kubernotify
           imagePullPolicy: IfNotPresent
+          tty: true # Add this line
+          stdin: true # And this line if you want stdin as well
           ports:
             - containerPort: 6000
               # hostPort: 6000
