@@ -6,33 +6,49 @@ const k8s = require('@kubernetes/client-node');
 const fetch = require('node-fetch');
 const yaml = require('js-yaml');
 const path = require("path");
+const readline = require('readline');
+
+
+
 
 //command line input stuff
 
-process.stdin.setEncoding('utf8');
+// process.stdin.setEncoding('utf8');
 
-console.log('App started. Type "add" or "subtract" followed by numbers.');
+// console.log('App started. Type "add" or "subtract" followed by numbers.');
 
-process.stdin.on('readable', () => {
-  let chunk;
-  // Use a loop to make sure we read all available data.
-  while ((chunk = process.stdin.read()) !== null) {
-    const input = chunk.trim(); // Remove the trailing new line character
-    const [command, ...values] = input.split(' ');
-    if (command === 'get') {
-      if (values[0] === 'nodes') getNodes();
-      else if (values[0] === 'pods') getPods();
-      else if (values[0] === 'containers') getContainers();
-      else console.log('What are you looking for again?')
-    } else {
-      console.log('Unknown command.');
-    }
-  }
-});
+// process.stdin.on('readable', () => {
+//   let chunk;
+//   // Use a loop to make sure we read all available data.
+//   while ((chunk = process.stdin.read()) !== null) {
+//     const input = chunk.trim(); // Remove the trailing new line character
+//     const [command, ...values] = input.split(' ');
+//     if (command === 'get') {
+//       if (values[0] === 'nodes') getNodes();
+//       else if (values[0] === 'pods') getPods();
+//       else if (values[0] === 'containers') getContainers();
+//       else console.log('What are you looking for again?')
+//     } else {
+//       console.log('Unknown command.');
+//     }
+//   }
+// });
 
-process.stdin.on('end', () => {
-  process.stdout.write('End of stream.\n');
-});
+// process.stdin.on('end', () => {
+//   process.stdout.write('End of stream.\n');
+// });
+
+
+
+
+
+
+
+
+
+
+
+
 //we have to install node-fetch because fetch is not built into node by default, the browser on the front end has it built in though
 // Initialize Kubernetes API client
 const kc = new k8s.KubeConfig();
@@ -190,7 +206,8 @@ const getPods = () => {
   k8sApi.listPodForAllNamespaces().then((res) => {
     console.log('Pods in all namespaces:');
     res.body.items.forEach((pod) => {
-        console.log(`${pod.metadata.namespace}/${pod.metadata.name}`);
+        // console.log(`${pod.metadata.namespace}/${pod.metadata.name}`);
+        console.log(`${pod.metadata.name}`);
     });
 })
 .catch((err) => {
@@ -237,6 +254,32 @@ const getContainers = () => {
 
 // getContainers();
 
+let intervalID;
+const podChecker = () => {
+  intervalID = setInterval(() => {
+    //query for pod list
+    k8sApi.listPodForAllNamespaces().then((res) => {
+      console.log('Pods in all namespaces:');
+      res.body.items.forEach((pod) => {
+           //query from database
+           //if pod is not in database, add to database and log that it was created
+           //if existing pod in database is not in query, delete it from database, and log that it was destroyed
+          
+          
+          console.log(`${pod.metadata.name}`);
+      });
+  })
+  .catch((err) => {
+      console.error('Error:', err);
+  }); 
+   
+
+  }, 1000)
+};
+
+const stopPodCheck = () => {
+  clearInterval(intervalID)
+};
 
 
 // app.get('/', (req, res) => {
@@ -257,6 +300,64 @@ const getContainers = () => {
 //   res.status(errorObj.status).send(JSON.stringify(errorObj.message));
 //   // res.status(errorObj.status).json(errorObj.message); does the same thing
 // });
+
+//more cli interface stuff:
+//readline interface
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+console.log('Welcome to the KuberNotify CLI. Type "help" for commands.');
+
+const promptForCommand = () => {
+  rl.question('> ', (command) => {
+    switch (command.trim().toLowerCase()) {
+      case 'watchdog get pods':
+        console.log('Getting pods!');
+        getPods();
+        break;
+
+      case 'watchdog get containers':
+        console.log('Getting containers!');
+        getContainers();
+        break;
+
+      case 'watchdog get nodes':
+        console.log('Getting nodes!');
+        getNodes();
+        break;
+
+      case 'watchdog help':
+        console.log('Try asking me to "Watchdog Get Pods", "Watchdog Get Containers", "Watchdog Get Nodes", or "Watchdog Quit" to exit.');
+        break;
+
+      case 'watchdog watch pods':
+        console.log('Watchdog is watching over your pods!');
+        podChecker();
+        break;
+
+      case 'watchdog stop watching pods':
+        console.log('Watchdog is taking a break from pods!');
+        stopPodCheck();
+        break;
+
+      case 'watchdog quit':
+        console.log('Goodbye!');
+        rl.close();
+        return;
+
+      default:
+        console.log('Unknown command. Type "help" for available commands.');
+    }
+
+    promptForCommand(); // Continue prompting
+  });
+};
+
+promptForCommand();
+
+
 
 app.listen(port, () => {
   console.log(`Server is listening on Port: ${port}!`);
