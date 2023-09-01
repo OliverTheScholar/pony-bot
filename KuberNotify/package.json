@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": ["cli"],
+  "keywords": [
+    "cli"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
