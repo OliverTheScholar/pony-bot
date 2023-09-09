@@ -269,11 +269,12 @@ const podChecker = async () => {
     for (let i = 0; i < currentPods.length; i++) {
       if (!res.includes(currentPods[i].name)){
         console.log (`${currentPods[i].name} has crashed!`.red)
-        await prisma.Pods.deleteMany({
-          where: {
-            name: currentPods[i].name
-          }
-        })
+        localStorage.splice(indexOf(currentPods[i].name), 1)
+        // await prisma.Pods.deleteMany({
+        //   where: {
+        //     name: currentPods[i].name
+        //   }
+        // })
       }
     }
   }
