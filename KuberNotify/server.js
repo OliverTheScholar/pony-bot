@@ -215,12 +215,22 @@ const getContainers = () => {
 
 let intervalID;
 
-const dbPull = async () => {
-    const result = await prisma.Pods.findMany();
-    return result
+const localStorage = [];
+
+// const dbPull = async () => {
+//     const result = await prisma.Pods.findMany();
+//     return result
+// }
+// const dbAdd = async (podname) => {
+//   await prisma.Pods.create({data: {name: podname}})
+// }
+
+const dbPull = () => {
+  return localStorage;
 }
-const dbAdd = async (podname) => {
-  await prisma.Pods.create({data: {name: podname}})
+
+const dbAdd = (podname) => {
+  localStorage.push({name: podname})
 }
 
 const podChecker = async () => {
