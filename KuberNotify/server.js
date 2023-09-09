@@ -9,8 +9,8 @@ const path = require("path");
 const readline = require('readline');
 const colors = require('colors');
 
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
+// const { PrismaClient } = require('@prisma/client')
+// const prisma = new PrismaClient()
 
 //we have to install node-fetch because fetch is not built into node by default, the browser on the front end has it built in though
 // Initialize Kubernetes API client
@@ -269,7 +269,7 @@ const podChecker = async () => {
     for (let i = 0; i < currentPods.length; i++) {
       if (!res.includes(currentPods[i].name)){
         console.log (`${currentPods[i].name} has crashed!`.red)
-        localStorage.splice(indexOf(currentPods[i].name), 1)
+        localStorage.splice(i, 1)
         // await prisma.Pods.deleteMany({
         //   where: {
         //     name: currentPods[i].name
